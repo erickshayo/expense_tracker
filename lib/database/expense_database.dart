@@ -20,10 +20,10 @@ class ExpenseDatabase extends ChangeNotifier {
 
   /*
   GETTERS
-  
   */
+  List<Expense> get allExpense => _allExpenses;
 
-/*
+  /*
 
   OPERATIONS
   
