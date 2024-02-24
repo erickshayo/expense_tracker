@@ -5,16 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-TextEditingController nameController = TextEditingController();
-TextEditingController amountController = TextEditingController();
-
 class _HomePageState extends State<HomePage> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    Provider.of<ExpenseDatabase>(context, listen: false).readExpenses();
+    super.initState();
+  }
+
   void openNewExpenseBox() {
     showDialog(
       context: context,
@@ -35,6 +42,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           _cancelButton(),
+          _createNewExpenseButton(),
         ],
       ),
     );
@@ -42,10 +50,22 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: openNewExpenseBox,
-        child: Icon(Icons.add),
+    return Consumer<ExpenseDatabase>(
+      builder: (context, value, child) => Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: openNewExpenseBox,
+          child: Icon(Icons.add),
+        ),
+        body: ListView.builder(
+          itemCount: value.allExpense.length,
+          itemBuilder: (context, index) {
+            Expense individualExpense = value.allExpense[index];
+            return ListTile(
+              title: Text(individualExpense.name),
+              trailing: Text(individualExpense.amount.toString()),
+            );
+          },
+        ),
       ),
     );
   }
