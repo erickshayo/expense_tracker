@@ -1,4 +1,8 @@
+import 'package:expense_tracker/database/expense_database.dart';
+import 'package:expense_tracker/helper/helper_functions.dart';
+import 'package:expense_tracker/models/expense.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,7 +33,9 @@ class _HomePageState extends State<HomePage> {
             )
           ],
         ),
-        actions: [_cancelButton(),],
+        actions: [
+          _cancelButton(),
+        ],
       ),
     );
   }
@@ -43,16 +49,38 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   Widget _cancelButton() {
-  return MaterialButton(
-    onPressed: () {
-      Navigator.pop(context);
-      nameController.clear();
-      amountController.clear();
-    },
-    child: Text("Cancel"),
-  );
-}
+    return MaterialButton(
+      onPressed: () {
+        Navigator.pop(context);
+        nameController.clear();
+        amountController.clear();
+      },
+      child: Text("Cancel"),
+    );
+  }
 
-}
+  Widget _createNewExpenseButton() {
+    return MaterialButton(
+      onPressed: () async {
+        if (nameController.text.isNotEmpty &&
+            amountController.text.isNotEmpty) {
+          Navigator.pop(context);
 
+          Expense newExpense = Expense(
+            name: nameController.text,
+            amount: convertStringToDouble(amountController.text),
+            date: DateTime.now(),
+          );
+
+          await context.read<ExpenseDatabase>().createNewExpense(newExpense);
+
+          nameController.clear();
+          amountController.clear();
+        }
+      },
+      child: Text("Save"),
+    );
+  }
+}
