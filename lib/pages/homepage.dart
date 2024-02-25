@@ -1,3 +1,4 @@
+import 'package:expense_tracker/components/my_list_tile.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/helper/helper_functions.dart';
 import 'package:expense_tracker/models/expense.dart';
@@ -60,10 +61,9 @@ class _HomePageState extends State<HomePage> {
           itemCount: value.allExpense.length,
           itemBuilder: (context, index) {
             Expense individualExpense = value.allExpense[index];
-            return ListTile(
-              title: Text(individualExpense.name),
-              trailing: Text(individualExpense.amount.toString()),
-            );
+            return MyListTile(
+                title: individualExpense.name,
+                trailing: formatAmount(individualExpense.amount));
           },
         ),
       ),
