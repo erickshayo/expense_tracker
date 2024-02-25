@@ -1,20 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class MyListTile extends StatelessWidget {
   final String title;
   final String trailing;
+  final void Function(BuildContext)? onEditPressed;
+  final void Function(BuildContext)? onDeletePressed;
 
-  MyListTile({
-    super.key,
-    required this.title,
-    required this.trailing,
-  });
+  MyListTile(
+      {super.key,
+      required this.title,
+      required this.trailing,
+      required this.onEditPressed,
+      required this.onDeletePressed});
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      trailing: Text(trailing),
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: StretchMotion(),
+        children: [
+          SlidableAction(
+            onPressed: onEditPressed,
+            icon: Icons.settings,
+            backgroundColor: Colors.grey,
+            foregroundColor: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          SlidableAction(
+            onPressed: onDeletePressed,
+            icon: Icons.delete,
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+          )
+        ],
+      ),
+      child: ListTile(
+        title: Text(title),
+        trailing: Text(trailing),
+      ),
     );
   }
 }
