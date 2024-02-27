@@ -3,6 +3,7 @@ import 'package:expense_tracker/components/my_list_tile.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/helper/helper_functions.dart';
 import 'package:expense_tracker/models/expense.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +19,19 @@ class _HomePageState extends State<HomePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
 
+  Future<Map<int, double>>? _monthlyTotalsFuture;
+
   @override
   void initState() {
     // TODO: implement initState
     Provider.of<ExpenseDatabase>(context, listen: false).readExpenses();
+    refreshGraphData();
     super.initState();
+  }
+
+  void refreshGraphData() {
+    _monthlyTotalsFuture = Provider.of<ExpenseDatabase>(context, listen: false)
+        .calculateMonthlyTotals();
   }
 
   void openNewExpenseBox() {
@@ -105,7 +114,8 @@ class _HomePageState extends State<HomePage> {
       int currentYear = DateTime.now().year;
 
       //
-
+      int monthCount =
+          calculateMonthCount(startYear, startMonth, currentYear, currentMonth);
 
       return Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -114,7 +124,26 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Column(
           children: [
-            //MyBarGraph(monthlySummary: monthlySummary, startMonth: startMonth),
+            SizedBox(
+              height: 250,
+              child: FutureBuilder(
+                  future: _monthlyTotalsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      final monthlyTotals = snapshot.data ?? {};
+              
+                      List<double> monthlySummary = List.generate(monthCount,
+                          (index) => monthlyTotals[startMonth + index] ?? 0.0);
+              
+                      return MyBarGraph(
+                          monthlySummary: monthlySummary, startMonth: startMonth);
+                    } else {
+                      return Center(
+                        child: Text("Loading..."),
+                      );
+                    }
+                  }),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: value.allExpense.length,
