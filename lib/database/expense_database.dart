@@ -52,7 +52,6 @@ class ExpenseDatabase extends ChangeNotifier {
 
   //Delete
   Future<void> deleteExpense(int id) async {
-    
     await isar.writeTxn(() => isar.expenses.delete(id));
 
     await readExpenses();
@@ -62,4 +61,38 @@ class ExpenseDatabase extends ChangeNotifier {
   HELPERS
   
   */
+
+  //calculate the total expense for each month
+  Future<Map<int, double>> calculateMonthlyTotals() async {
+    await readExpenses();
+    Map<int, double> monthlyTotals = {};
+    for (var expense in _allExpenses) {
+      int month = expense.date.month;
+      if (monthlyTotals.containsKey(month)) {
+        monthlyTotals[month] = 0;
+      }
+      monthlyTotals[month] = monthlyTotals[month]! + expense.amount;
+    }
+    return monthlyTotals;
+  }
+
+  // get the start month
+  int getStartMonth() {
+    if (_allExpenses.isEmpty) {
+      return DateTime.now().month;
+    }
+    _allExpenses.sort((a, b) => a.date.compareTo(b.date));
+    return _allExpenses.first.date.month;
+  }
+
+  // get the start year
+  int getStartYear() {
+    if (_allExpenses.isEmpty) {
+      return DateTime.now().year;
+    }
+    _allExpenses.sort(
+      (a, b) => a.date.compareTo(b.date),
+    );
+    return _allExpenses.first.date.year;
+  }
 }
