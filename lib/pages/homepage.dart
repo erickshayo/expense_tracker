@@ -122,44 +122,46 @@ class _HomePageState extends State<HomePage> {
           onPressed: openNewExpenseBox,
           child: Icon(Icons.add),
         ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 250,
-              child: FutureBuilder(
-                  future: _monthlyTotalsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      final monthlyTotals = snapshot.data ?? {};
-              
-                      List<double> monthlySummary = List.generate(monthCount,
-                          (index) => monthlyTotals[startMonth + index] ?? 0.0);
-              
-                      return MyBarGraph(
-                          monthlySummary: monthlySummary, startMonth: startMonth);
-                    } else {
-                      return Center(
-                        child: Text("Loading..."),
-                      );
-                    }
-                  }),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: value.allExpense.length,
-                itemBuilder: (context, index) {
-                  Expense individualExpense = value.allExpense[index];
-                  return MyListTile(
-                    title: individualExpense.name,
-                    trailing: formatAmount(individualExpense.amount),
-                    onEditPressed: (context) => openEditBox(individualExpense),
-                    onDeletePressed: (context) =>
-                        openDeleteBox(individualExpense),
-                  );
-                },
+        body: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 250,
+                child: FutureBuilder(
+                    future: _monthlyTotalsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        final monthlyTotals = snapshot.data ?? {};
+                
+                        List<double> monthlySummary = List.generate(monthCount,
+                            (index) => monthlyTotals[startMonth + index] ?? 0.0);
+                
+                        return MyBarGraph(
+                            monthlySummary: monthlySummary, startMonth: startMonth);
+                      } else {
+                        return Center(
+                          child: Text("Loading..."),
+                        );
+                      }
+                    }),
               ),
-            ),
-          ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: value.allExpense.length,
+                  itemBuilder: (context, index) {
+                    Expense individualExpense = value.allExpense[index];
+                    return MyListTile(
+                      title: individualExpense.name,
+                      trailing: formatAmount(individualExpense.amount),
+                      onEditPressed: (context) => openEditBox(individualExpense),
+                      onDeletePressed: (context) =>
+                          openDeleteBox(individualExpense),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       );
     });
