@@ -3,7 +3,6 @@ import 'package:expense_tracker/components/my_list_tile.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/helper/helper_functions.dart';
 import 'package:expense_tracker/models/expense.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -132,12 +131,15 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         final monthlyTotals = snapshot.data ?? {};
-                
-                        List<double> monthlySummary = List.generate(monthCount,
-                            (index) => monthlyTotals[startMonth + index] ?? 0.0);
-                
+
+                        List<double> monthlySummary = List.generate(
+                            monthCount,
+                            (index) =>
+                                monthlyTotals[startMonth + index] ?? 0.0);
+
                         return MyBarGraph(
-                            monthlySummary: monthlySummary, startMonth: startMonth);
+                            monthlySummary: monthlySummary,
+                            startMonth: startMonth);
                       } else {
                         return Center(
                           child: Text("Loading..."),
@@ -153,7 +155,8 @@ class _HomePageState extends State<HomePage> {
                     return MyListTile(
                       title: individualExpense.name,
                       trailing: formatAmount(individualExpense.amount),
-                      onEditPressed: (context) => openEditBox(individualExpense),
+                      onEditPressed: (context) =>
+                          openEditBox(individualExpense),
                       onDeletePressed: (context) =>
                           openDeleteBox(individualExpense),
                     );
@@ -193,6 +196,8 @@ class _HomePageState extends State<HomePage> {
 
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
 
+          refreshGraphData();
+
           nameController.clear();
           amountController.clear();
         }
@@ -221,6 +226,8 @@ class _HomePageState extends State<HomePage> {
           await context
               .read<ExpenseDatabase>()
               .updateExpense(existingId, updatedExpense);
+
+          refreshGraphData();
         }
       },
       child: Text("Save"),
@@ -232,6 +239,8 @@ class _HomePageState extends State<HomePage> {
       onPressed: () async {
         Navigator.pop(context);
         await context.read<ExpenseDatabase>().deleteExpense(id);
+
+        refreshGraphData();
       },
       child: Text("Delete"),
     );

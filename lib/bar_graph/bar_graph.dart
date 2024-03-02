@@ -30,6 +30,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
   @override
   Widget build(BuildContext context) {
+    initializeBarData();
     return BarChart(
       BarChartData(
         minY: 0,
@@ -45,15 +46,30 @@ class _MyBarGraphState extends State<MyBarGraph> {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: getBottomTitles,
+              reservedSize: 24,
             ),
           ),
         ),
+        barGroups: barData
+            .map(
+              (data) => BarChartGroupData(
+                x: data.x,
+                barRods: [
+                  BarChartRodData(
+                      toY: data.y,
+                      width: 20,
+                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.grey),
+                ],
+              ),
+            )
+            .toList(),
       ),
     );
   }
 }
 
-Widget getBottomTitles(double value, TitleMeta meta) { 
+Widget getBottomTitles(double value, TitleMeta meta) {
   const textstyle = TextStyle(
     color: Colors.grey,
     fontWeight: FontWeight.bold,
